@@ -35,8 +35,21 @@ const Sidebar = ({ isOpen, onClose }) => {
         <div className="p-4 border-b border-gray-200 dark:border-gray-700">
           <div className="flex items-center justify-between">
             <Link to="/dashboard" className="flex items-center gap-2" onClick={onClose}>
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary-500 to-secondary-500 flex items-center justify-center">
-                <span className="text-white font-bold text-xl">T</span>
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary-500 to-primary-600 flex items-center justify-center shadow-lg">
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  className="w-6 h-6"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M5 13l4 4L19 7"
+                    stroke="white"
+                    strokeWidth="3"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
               </div>
               <div>
                 <span className="text-lg font-bold gradient-text block">

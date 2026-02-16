@@ -15,19 +15,21 @@ const Layout = () => {
         
         {/* Main Content Area */}
         <div className="flex-1 flex flex-col overflow-hidden">
-          {/* Navbar */}
-          <Navbar />
+          {/* Navbar with Mobile Menu Button */}
+          <div className="relative">
+            {/* Mobile Menu Button - Top Left */}
+            <button
+              onClick={() => setSidebarOpen(true)}
+              className="lg:hidden fixed top-4 left-4 z-30 p-3 bg-primary-500 text-white rounded-xl shadow-lg hover:shadow-xl transition-all"
+            >
+              <Menu size={20} />
+            </button>
+
+            <Navbar />
+          </div>
           
           {/* Page Content */}
           <main className="flex-1 overflow-y-auto">
-            {/* Mobile Menu Button */}
-            <button
-              onClick={() => setSidebarOpen(true)}
-              className="lg:hidden fixed bottom-4 right-4 z-30 p-4 bg-primary-500 text-white rounded-full shadow-lg hover:shadow-xl transition-all btn-hover"
-            >
-              <Menu size={24} />
-            </button>
-
             <div className="p-4 sm:p-6 lg:p-8">
               <Outlet />
             </div>
