@@ -62,7 +62,7 @@ export const authController = {
   // Get current user profile
   async getProfile(req, res, next) {
     try {
-      const user = await authService.getUserProfile(req.user.userId);
+      const user = await authService.getUserProfile(req.user.id); // ← FIXED: Changed from userId to id
       res.json({ user });
     } catch (error) {
       next(error);
@@ -74,7 +74,7 @@ export const authController = {
     try {
       const { fullName, avatarUrl } = req.body;
 
-      const user = await authService.updateProfile(req.user.userId, {
+      const user = await authService.updateProfile(req.user.id, { // ← FIXED: Changed from userId to id
         fullName,
         avatarUrl,
       });
