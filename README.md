@@ -10,9 +10,10 @@ applications.
 
 ## 🌐 Live Deployment
 
-- **Frontend (Vercel):** https://badminton-booking-system-nine.vercel.app/  
-- **Backend (Render):** https://badminton-booking-system-1.onrender.com  
-- **Live Demo Link:** https://badminton-booking-system-nine.vercel.app/
+- **Live Demo Link:** https://task-collab-platform.vercel.app
+
+- **Frontend (Vercel):** https://task-collab-platform.vercel.app
+- **Backend (Render):** https://task-collab-backend.onrender.com
 
 ------------------------------------------------------------------------
 
@@ -307,20 +308,15 @@ GET /api/boards/:boardId/activity
 # 👥 Demo Credentials
 
 Email: demo@taskcollab.com\
-Password: demo123
+Password: 123456
 
 ------------------------------------------------------------------------
 
 # 👨‍💻 Author
 
-Built by **Harsha Vardhan** as a **production‑level full‑stack
+Built by **Harsha Vardhan Yanakandla** as a **production‑level full‑stack
 project**\
 Showcasing modern MERN + PostgreSQL + WebSocket architecture.
 
 Built with ❤️ using React, Node.js, PostgreSQL, Socket.IO
 
-------------------------------------------------------------------------
-
-# 📜 License
-
-MIT License -- Free for learning & portfolio use.
