@@ -42,14 +42,16 @@ export const useBoardStore = create((set, get) => ({
     // Check if list already exists
     const existingList = state.lists.find(l => l.id === list.id);
     if (existingList) {
+      console.log('⚠️ List already exists, skipping duplicate:', list.id);
       return state; // Don't add duplicate
     }
 
+    console.log('✅ Adding new list:', list.id);
     return {
-      lists: [...state.lists, { ...list, tasks: [] }],
+      lists: [...state.lists, { ...list, tasks: list.tasks || [] }],
       activeBoard: state.activeBoard ? {
         ...state.activeBoard,
-        lists: [...(state.activeBoard.lists || []), { ...list, tasks: [] }],
+        lists: [...(state.activeBoard.lists || []), { ...list, tasks: list.tasks || [] }],
       } : null,
     };
   }),
@@ -64,14 +66,27 @@ export const useBoardStore = create((set, get) => ({
     lists: state.lists.filter((list) => list.id !== listId),
   })),
 
-  // Task operations within lists
-  addTask: (listId, task) => set((state) => ({
-    lists: state.lists.map((list) =>
-      list.id === listId
-        ? { ...list, tasks: [...(list.tasks || []), task] }
-        : list
-    ),
-  })),
+  // Task operations - FIXED: Check for duplicates
+  addTask: (listId, task) => set((state) => {
+    console.log('📝 Adding task to list:', listId, 'Task ID:', task.id);
+    
+    return {
+      lists: state.lists.map((list) => {
+        if (list.id === listId) {
+          // Check if task already exists in this list
+          const existingTask = (list.tasks || []).find(t => t.id === task.id);
+          if (existingTask) {
+            console.log('⚠️ Task already exists, skipping duplicate:', task.id);
+            return list; // Don't add duplicate
+          }
+          
+          console.log('✅ Adding new task:', task.id);
+          return { ...list, tasks: [...(list.tasks || []), task] };
+        }
+        return list;
+      }),
+    };
+  }),
 
   updateTask: (taskId, updates) => set((state) => ({
     lists: state.lists.map((list) => ({
