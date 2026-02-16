@@ -1,0 +1,112 @@
+task-collab-platform/
+│
+├── backend/
+│   ├── src/
+│   │   ├── config/
+│   │   │   ├── database.js
+│   │   │   └── socket.js
+│   │   ├── controllers/
+│   │   │   ├── authController.js
+│   │   │   ├── boardController.js
+│   │   │   ├── listController.js
+│   │   │   ├── taskController.js
+│   │   │   └── activityController.js
+│   │   ├── middleware/
+│   │   │   ├── authMiddleware.js
+│   │   │   └── errorHandler.js
+│   │   ├── routes/
+│   │   │   ├── authRoutes.js
+│   │   │   ├── boardRoutes.js
+│   │   │   ├── listRoutes.js
+│   │   │   ├── taskRoutes.js
+│   │   │   └── activityRoutes.js
+│   │   ├── services/
+│   │   │   ├── authService.js
+│   │   │   ├── boardService.js
+│   │   │   ├── listService.js
+│   │   │   ├── taskService.js
+│   │   │   └── activityService.js
+│   │   ├── socket/
+│   │   │   └── socketHandlers.js
+│   │   ├── utils/
+│   │   │   └── logger.js
+│   │   └── server.js
+│   ├── migrations/
+│   │   └── 001_initial_schema.sql
+│   ├── package.json
+│   └── .env.example
+│
+├── frontend/
+│   ├── public/
+│   │   └── vite.svg
+│   ├── src/
+│   │   ├── assets/
+│   │   │   └── react.svg
+│   │   ├── components/
+│   │   │   ├── common/
+│   │   │   │   ├── Button.jsx
+│   │   │   │   ├── Input.jsx
+│   │   │   │   ├── Modal.jsx
+│   │   │   │   ├── Avatar.jsx
+│   │   │   │   ├── Toast.jsx
+│   │   │   │   ├── Skeleton.jsx
+│   │   │   │   └── ThemeToggle.jsx
+│   │   │   ├── layout/
+│   │   │   │   ├── Navbar.jsx
+│   │   │   │   ├── Sidebar.jsx
+│   │   │   │   └── Layout.jsx
+│   │   │   ├── board/
+│   │   │   │   ├── BoardCard.jsx
+│   │   │   │   ├── BoardList.jsx
+│   │   │   │   ├── CreateBoardModal.jsx
+│   │   │   │   └── BoardHeader.jsx
+│   │   │   ├── list/
+│   │   │   │   ├── List.jsx
+│   │   │   │   ├── ListHeader.jsx
+│   │   │   │   └── CreateListModal.jsx
+│   │   │   ├── task/
+│   │   │   │   ├── TaskCard.jsx
+│   │   │   │   ├── TaskModal.jsx
+│   │   │   │   ├── CreateTaskModal.jsx
+│   │   │   │   ├── TaskAssignee.jsx
+│   │   │   │   └── TaskDueDate.jsx
+│   │   │   ├── activity/
+│   │   │   │   ├── ActivityFeed.jsx
+│   │   │   │   └── ActivityItem.jsx
+│   │   │   └── notifications/
+│   │   │       └── NotificationBell.jsx
+│   │   ├── pages/
+│   │   │   ├── Login.jsx
+│   │   │   ├── Signup.jsx
+│   │   │   ├── Dashboard.jsx
+│   │   │   ├── BoardView.jsx
+│   │   │   └── Profile.jsx
+│   │   │   ├── Activity.jsx
+│   │   │   └── Settings.jsx
+│   │   ├── store/
+│   │   │   ├── authStore.js
+│   │   │   ├── boardStore.js
+│   │   │   ├── taskStore.js
+│   │   │   ├── themeStore.js
+│   │   │   └── notificationStore.js
+│   │   ├── hooks/
+│   │   │   ├── useSocket.js
+│   │   │   ├── useAuth.js
+│   │   │   └── useToast.js
+│   │   ├── services/
+│   │   │   ├── api.js
+│   │   │   └── socket.js
+│   │   ├── utils/
+│   │   │   ├── constants.js
+│   │   │   └── helpers.js
+│   │   ├── App.jsx
+│   │   ├── main.jsx
+│   │   └── index.css
+│   ├── index.html
+│   ├── package.json
+│   ├── vite.config.js
+│   ├── tailwind.config.js
+│   ├── postcss.config.js
+│   └── .env.example
+│
+└── README.md
