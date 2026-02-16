@@ -5,13 +5,21 @@ let io;
 
 // Initialize Socket.IO server
 export const initializeSocket = (server) => {
+  const allowedOrigins = [
+    'http://localhost:5173',
+    'http://localhost:3000',
+    'https://task-collab-platform.vercel.app', // Your Vercel URL
+    process.env.CLIENT_URL,
+  ].filter(Boolean);
+
   io = new Server(server, {
     cors: {
-      origin: process.env.CORS_ORIGIN || 'http://localhost:5173',
+      origin: allowedOrigins,
       methods: ['GET', 'POST'],
       credentials: true,
     },
     pingTimeout: 60000,
+    transports: ['websocket', 'polling'],
   });
 
   // Socket authentication middleware
@@ -27,6 +35,7 @@ export const initializeSocket = (server) => {
       socket.userEmail = decoded.email;
       next();
     } catch (error) {
+      console.error('Socket auth error:', error);
       next(new Error('Authentication error'));
     }
   });

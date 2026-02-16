@@ -1,5 +1,5 @@
 -- Users Table
-CREATE TABLE users (
+CREATE TABLE IF NOT EXISTS users (
     id SERIAL PRIMARY KEY,
     email VARCHAR(255) UNIQUE NOT NULL,
     password_hash VARCHAR(255) NOT NULL,
@@ -10,7 +10,7 @@ CREATE TABLE users (
 );
 
 -- Boards Table
-CREATE TABLE boards (
+CREATE TABLE IF NOT EXISTS boards (
     id SERIAL PRIMARY KEY,
     title VARCHAR(255) NOT NULL,
     description TEXT,
@@ -21,7 +21,7 @@ CREATE TABLE boards (
 );
 
 -- Board Members Table (many-to-many)
-CREATE TABLE board_members (
+CREATE TABLE IF NOT EXISTS board_members (
     id SERIAL PRIMARY KEY,
     board_id INTEGER REFERENCES boards(id) ON DELETE CASCADE,
     user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
@@ -31,7 +31,7 @@ CREATE TABLE board_members (
 );
 
 -- Lists Table
-CREATE TABLE lists (
+CREATE TABLE IF NOT EXISTS lists (
     id SERIAL PRIMARY KEY,
     board_id INTEGER REFERENCES boards(id) ON DELETE CASCADE,
     title VARCHAR(255) NOT NULL,
@@ -41,7 +41,7 @@ CREATE TABLE lists (
 );
 
 -- Tasks Table
-CREATE TABLE tasks (
+CREATE TABLE IF NOT EXISTS tasks (
     id SERIAL PRIMARY KEY,
     list_id INTEGER REFERENCES lists(id) ON DELETE CASCADE,
     board_id INTEGER REFERENCES boards(id) ON DELETE CASCADE,
@@ -58,7 +58,7 @@ CREATE TABLE tasks (
 );
 
 -- Task Assignments Table (many-to-many)
-CREATE TABLE task_assignments (
+CREATE TABLE IF NOT EXISTS task_assignments (
     id SERIAL PRIMARY KEY,
     task_id INTEGER REFERENCES tasks(id) ON DELETE CASCADE,
     user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
@@ -67,7 +67,7 @@ CREATE TABLE task_assignments (
 );
 
 -- Activity Logs Table
-CREATE TABLE activity_logs (
+CREATE TABLE IF NOT EXISTS activity_logs (
     id SERIAL PRIMARY KEY,
     board_id INTEGER REFERENCES boards(id) ON DELETE CASCADE,
     user_id INTEGER REFERENCES users(id) ON DELETE SET NULL,
@@ -78,18 +78,18 @@ CREATE TABLE activity_logs (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Indexes for performance
-CREATE INDEX idx_boards_owner ON boards(owner_id);
-CREATE INDEX idx_board_members_board ON board_members(board_id);
-CREATE INDEX idx_board_members_user ON board_members(user_id);
-CREATE INDEX idx_lists_board ON lists(board_id);
-CREATE INDEX idx_tasks_list ON tasks(list_id);
-CREATE INDEX idx_tasks_board ON tasks(board_id);
-CREATE INDEX idx_task_assignments_task ON task_assignments(task_id);
-CREATE INDEX idx_task_assignments_user ON task_assignments(user_id);
-CREATE INDEX idx_activity_logs_board ON activity_logs(board_id);
-CREATE INDEX idx_users_email ON users(email);
-CREATE INDEX idx_tasks_title_search ON tasks USING gin(to_tsvector('english', title));
+-- Indexes for performance (IF NOT EXISTS requires PostgreSQL 9.5+)
+CREATE INDEX IF NOT EXISTS idx_boards_owner ON boards(owner_id);
+CREATE INDEX IF NOT EXISTS idx_board_members_board ON board_members(board_id);
+CREATE INDEX IF NOT EXISTS idx_board_members_user ON board_members(user_id);
+CREATE INDEX IF NOT EXISTS idx_lists_board ON lists(board_id);
+CREATE INDEX IF NOT EXISTS idx_tasks_list ON tasks(list_id);
+CREATE INDEX IF NOT EXISTS idx_tasks_board ON tasks(board_id);
+CREATE INDEX IF NOT EXISTS idx_task_assignments_task ON task_assignments(task_id);
+CREATE INDEX IF NOT EXISTS idx_task_assignments_user ON task_assignments(user_id);
+CREATE INDEX IF NOT EXISTS idx_activity_logs_board ON activity_logs(board_id);
+CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
+CREATE INDEX IF NOT EXISTS idx_tasks_title_search ON tasks USING gin(to_tsvector('english', title));
 
 -- Function to update updated_at timestamp
 CREATE OR REPLACE FUNCTION update_updated_at_column()
@@ -100,15 +100,19 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
--- Triggers for updated_at
+-- Triggers for updated_at (DROP IF EXISTS to avoid errors)
+DROP TRIGGER IF EXISTS update_users_updated_at ON users;
 CREATE TRIGGER update_users_updated_at BEFORE UPDATE ON users
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
+DROP TRIGGER IF EXISTS update_boards_updated_at ON boards;
 CREATE TRIGGER update_boards_updated_at BEFORE UPDATE ON boards
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
+DROP TRIGGER IF EXISTS update_lists_updated_at ON lists;
 CREATE TRIGGER update_lists_updated_at BEFORE UPDATE ON lists
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
+DROP TRIGGER IF EXISTS update_tasks_updated_at ON tasks;
 CREATE TRIGGER update_tasks_updated_at BEFORE UPDATE ON tasks
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();

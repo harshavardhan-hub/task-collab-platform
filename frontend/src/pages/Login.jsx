@@ -88,12 +88,7 @@ const Login = () => {
           </div>
         </div>
 
-        {/* Demo Credentials */}
-        <div className="mt-6 p-4 bg-white/10 backdrop-blur-sm rounded-lg">
-          <p className="text-sm text-white/90 text-center">
-            <strong>Demo:</strong> demo@taskcollab.com / demo123
-          </p>
-        </div>
+        
       </div>
     </div>
   );

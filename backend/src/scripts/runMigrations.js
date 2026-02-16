@@ -30,10 +30,6 @@ async function runMigrations() {
       );
     `);
 
-    // Read migration file
-    const migrationsDir = path.join(__dirname, '../../migrations');
-    const migrationFile = path.join(migrationsDir, '001_initial_schema.sql');
-
     // Check if migration was already run
     const checkResult = await client.query(
       'SELECT * FROM schema_migrations WHERE filename = $1',
@@ -45,21 +41,67 @@ async function runMigrations() {
       return;
     }
 
+    // Check if tables already exist (for existing databases)
+    const tableCheck = await client.query(`
+      SELECT table_name 
+      FROM information_schema.tables 
+      WHERE table_schema = 'public' 
+      AND table_name = 'users'
+    `);
+
+    if (tableCheck.rows.length > 0) {
+      console.log('⚠️  Tables already exist, marking migration as complete');
+      await client.query(
+        'INSERT INTO schema_migrations (filename) VALUES ($1) ON CONFLICT (filename) DO NOTHING',
+        ['001_initial_schema.sql']
+      );
+      console.log('✅ Migration marked as complete');
+      return;
+    }
+
     // Read and execute migration
+    const migrationsDir = path.join(__dirname, '../../migrations');
+    const migrationFile = path.join(migrationsDir, '001_initial_schema.sql');
+
+    if (!fs.existsSync(migrationFile)) {
+      console.log('⚠️  No migration file found, skipping');
+      return;
+    }
+
     const migrationSQL = fs.readFileSync(migrationFile, 'utf8');
     
     await client.query('BEGIN');
+    
+    // Execute migration
     await client.query(migrationSQL);
+    
+    // Mark as executed
     await client.query(
       'INSERT INTO schema_migrations (filename) VALUES ($1)',
       ['001_initial_schema.sql']
     );
+    
     await client.query('COMMIT');
 
     console.log('✅ Migrations completed successfully');
   } catch (error) {
     await client.query('ROLLBACK');
-    console.error('❌ Migration failed:', error);
+    console.error('❌ Migration failed:', error.message);
+    
+    // Don't crash the app if tables already exist
+    if (error.code === '42P07') { // duplicate table
+      console.log('⚠️  Tables already exist, continuing...');
+      try {
+        await client.query(
+          'INSERT INTO schema_migrations (filename) VALUES ($1) ON CONFLICT (filename) DO NOTHING',
+          ['001_initial_schema.sql']
+        );
+      } catch (e) {
+        // Ignore
+      }
+      return;
+    }
+    
     throw error;
   } finally {
     client.release();
