@@ -30,6 +30,8 @@ task-collab-platform/
 │   │   │   └── socketHandlers.js
 │   │   ├── utils/
 │   │   │   └── logger.js
+│   │   ├── scripts/
+│   │   │   └── runMigrations.js
 │   │   └── server.js
 │   ├── migrations/
 │   │   └── 001_initial_schema.sql

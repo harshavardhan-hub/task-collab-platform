@@ -1,22 +1,27 @@
 import pkg from 'pg';
 const { Pool } = pkg;
 import dotenv from 'dotenv';
+import runMigrations from '../scripts/runMigrations.js';
 
 dotenv.config();
 
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
+  ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
   max: 20,
   idleTimeoutMillis: 30000,
   connectionTimeoutMillis: 2000,
 });
 
-// Test connection and export function
+// Test connection and run migrations
 export const connectDB = async () => {
   try {
     const client = await pool.connect();
     console.log('✅ Connected to PostgreSQL database');
     client.release();
+    
+    // Run migrations automatically
+    await runMigrations();
   } catch (error) {
     console.error('❌ Database connection error:', error);
     process.exit(1);
