@@ -49,44 +49,75 @@ const BoardHeader = ({ board, onAddMember, onDelete }) => {
         <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-black/20 pointer-events-none" />
         
         <div className="relative z-10">
-          <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 mb-6">
-            <div className="flex items-start gap-4">
-              <button
-                onClick={() => navigate('/dashboard')}
+          <div className="flex items-start gap-4 mb-6">
+            <button
+              onClick={() => navigate('/dashboard')}
+              className={clsx(
+                "mt-1 p-2 rounded-xl backdrop-blur-md transition-all shadow-sm",
+                isDarkText ? "bg-black/5 hover:bg-black/10 text-secondary-900" : "bg-white/10 hover:bg-white/20 text-white"
+              )}
+            >
+              <ArrowLeft size={20} />
+            </button>
+            <div>
+              <h1
                 className={clsx(
-                  "mt-1 p-2 rounded-xl backdrop-blur-md transition-all shadow-sm",
-                  isDarkText ? "bg-black/5 hover:bg-black/10 text-secondary-900" : "bg-white/10 hover:bg-white/20 text-white"
+                  "text-3xl sm:text-4xl font-display font-bold mb-2 tracking-tight drop-shadow-sm",
+                  isDarkText ? "text-secondary-900" : "text-white"
                 )}
               >
-                <ArrowLeft size={20} />
-              </button>
-              <div>
-                <h1
+                {board.title}
+              </h1>
+              {board.description && (
+                <p
                   className={clsx(
-                    "text-3xl sm:text-4xl font-display font-bold mb-2 tracking-tight drop-shadow-sm",
-                    isDarkText ? "text-secondary-900" : "text-white"
+                    "text-[15px] leading-relaxed max-w-2xl drop-shadow-sm",
+                    isDarkText ? "text-secondary-900/80" : "text-white/80"
                   )}
                 >
-                  {board.title}
-                </h1>
-                {board.description && (
-                  <p
-                    className={clsx(
-                      "text-[15px] leading-relaxed max-w-2xl drop-shadow-sm",
-                      isDarkText ? "text-secondary-900/80" : "text-white/80"
-                    )}
-                  >
-                    {board.description}
-                  </p>
+                  {board.description}
+                </p>
+              )}
+            </div>
+          </div>
+
+          {/* Members Area */}
+          <div className="flex flex-row items-center justify-between gap-4 pt-4 border-t border-white/20 dark:border-black/10 w-full overflow-hidden">
+            {/* Left Box: Team Members */}
+            <div className="flex flex-row items-center gap-3 overflow-x-auto flex-1">
+              <span
+                className={clsx(
+                  "text-xs sm:text-sm font-semibold uppercase tracking-wider whitespace-nowrap shrink-0",
+                  isDarkText ? "text-secondary-900/70" : "text-white/70"
                 )}
+              >
+                Team Members
+              </span>
+              <div className="flex items-center">
+                <div className="flex -space-x-3">
+                  {board.members?.map((member) => (
+                    <div key={member.id} className="relative group/avatar shrink-0">
+                      <Avatar
+                        user={member}
+                        size="sm"
+                        className="ring-2 ring-white/20 shadow-md cursor-pointer transition-transform hover:-translate-y-1 hover:z-10"
+                      />
+                      <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 px-3 py-1.5 bg-[#1C1C1F] text-white text-xs font-medium rounded-lg opacity-0 group-hover/avatar:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-20 shadow-xl border border-white/10">
+                        {member.full_name} {member.role === 'owner' && <span className="opacity-50">(Owner)</span>}
+                        <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-[#1C1C1F]" />
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
 
-            <div className="flex items-center gap-2 self-start">
+            {/* Right Box: Invite & Delete */}
+            <div className="flex items-center gap-2 shrink-0">
               <button
                 onClick={() => setShowAddMember(true)}
                 className={clsx(
-                  "flex items-center gap-2 px-4 py-2 text-sm font-semibold rounded-xl backdrop-blur-md transition-all shadow-sm",
+                  "flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 text-sm font-semibold rounded-xl backdrop-blur-md transition-all shadow-sm",
                   isDarkText ? "bg-black/5 hover:bg-black/10 text-secondary-900" : "bg-white/10 hover:bg-white/20 text-white"
                 )}
               >
@@ -99,44 +130,6 @@ const BoardHeader = ({ board, onAddMember, onDelete }) => {
                 title="Delete Board"
               >
                 <Trash2 size={18} />
-              </button>
-            </div>
-          </div>
-
-          {/* Members Area */}
-          <div className="flex flex-col sm:flex-row sm:items-center gap-4 pt-4 border-t border-white/20 dark:border-black/10">
-            <span
-              className={clsx(
-                "text-sm font-semibold uppercase tracking-wider",
-                isDarkText ? "text-secondary-900/70" : "text-white/70"
-              )}
-            >
-              Team Members
-            </span>
-            <div className="flex items-center gap-2">
-              <div className="flex -space-x-3">
-                {board.members?.map((member) => (
-                  <div key={member.id} className="relative group/avatar">
-                    <Avatar
-                      user={member}
-                      size="sm"
-                      className="ring-2 ring-white/20 shadow-md cursor-pointer transition-transform hover:-translate-y-1 hover:z-10"
-                    />
-                    <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 px-3 py-1.5 bg-[#1C1C1F] text-white text-xs font-medium rounded-lg opacity-0 group-hover/avatar:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-20 shadow-xl border border-white/10">
-                      {member.full_name} {member.role === 'owner' && <span className="opacity-50">(Owner)</span>}
-                      <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-[#1C1C1F]" />
-                    </div>
-                  </div>
-                ))}
-              </div>
-              <button
-                onClick={() => setShowAddMember(true)}
-                className={clsx(
-                  "w-8 h-8 rounded-full border border-dashed flex items-center justify-center transition-colors ml-1",
-                  isDarkText ? "border-secondary-900/30 text-secondary-900 hover:bg-black/5" : "border-white/30 text-white hover:bg-white/10"
-                )}
-              >
-                <UserPlus size={14} />
               </button>
             </div>
           </div>

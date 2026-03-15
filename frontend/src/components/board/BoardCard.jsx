@@ -138,19 +138,17 @@ const BoardCard = ({ board }) => {
                   >
                     <Users size={14} />
                   </button>
-                  {isOwner && (
-                    <button
-                      onClick={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        setShowDeleteConfirm(true);
-                      }}
-                      className="w-8 h-8 rounded-full flex items-center justify-center transition-colors shadow-sm ring-2 ring-white/20 border border-transparent backdrop-blur-md bg-red-500/80 hover:bg-red-500 text-white"
-                      title="Delete Board"
-                    >
-                      <Trash2 size={14} />
-                    </button>
-                  )}
+                  <button
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      setShowDeleteConfirm(true);
+                    }}
+                    className="w-8 h-8 rounded-full flex items-center justify-center transition-colors shadow-sm ring-2 ring-white/20 border border-transparent backdrop-blur-md bg-red-500/80 hover:bg-red-500 text-white"
+                    title="Delete Board"
+                  >
+                    <Trash2 size={14} />
+                  </button>
                 </div>
               </div>
 
