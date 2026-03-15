@@ -59,7 +59,21 @@ export const boardService = {
         [userId]
       );
 
-      return result.rows;
+      const boards = result.rows;
+      
+      // Fetch members for each board
+      for (let board of boards) {
+        const membersResult = await query(
+          `SELECT u.id, u.email, u.full_name, u.avatar_url, bm.role
+           FROM board_members bm
+           INNER JOIN users u ON bm.user_id = u.id
+           WHERE bm.board_id = $1`,
+          [board.id]
+        );
+        board.members = membersResult.rows;
+      }
+
+      return boards;
     } catch (error) {
       throw error;
     }
@@ -254,7 +268,56 @@ export const boardService = {
     } finally {
       client.release();
     }
-  }, 
+  },
+
+  // Remove member from board
+  async removeMember(boardId, memberId, requestingUserId) {
+    const client = await getClient();
+    try {
+      await client.query('BEGIN');
+
+      // Check if requester is owner
+      const ownerCheck = await client.query(
+        'SELECT id FROM boards WHERE id = $1 AND owner_id = $2',
+        [boardId, requestingUserId]
+      );
+
+      if (ownerCheck.rows.length === 0) {
+        throw new Error('Only board owner can remove members');
+      }
+
+      // Check if user is actually a member
+      const memberCheck = await client.query(
+        'SELECT id FROM board_members WHERE board_id = $1 AND user_id = $2',
+        [boardId, memberId]
+      );
+
+      if (memberCheck.rows.length === 0) {
+        throw new Error('User is not a member of this board');
+      }
+
+      // Remove as board member
+      await client.query(
+        'DELETE FROM board_members WHERE board_id = $1 AND user_id = $2',
+        [boardId, memberId]
+      );
+
+      // Log activity
+      await client.query(
+        `INSERT INTO activity_logs (board_id, user_id, action, entity_type, entity_id, metadata) 
+         VALUES ($1, $2, $3, $4, $5, $6)`,
+        [boardId, requestingUserId, 'member_removed', 'board', boardId, JSON.stringify({ memberId })]
+      );
+
+      await client.query('COMMIT');
+      return { success: true };
+    } catch (error) {
+      await client.query('ROLLBACK');
+      throw error;
+    } finally {
+      client.release();
+    }
+  },
 };
 
 export default boardService;

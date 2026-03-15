@@ -125,6 +125,27 @@ export const boardController = {
       next(error);
     }
   }, // ← FIXED: Added missing closing brace
+
+  // Remove member from board
+  async removeMember(req, res, next) {
+    try {
+      const { id, userId } = req.params;
+
+      const result = await boardService.removeMember(parseInt(id), parseInt(userId), req.user.id);
+
+      // Emit real-time update
+      const io = req.app.get('io');
+      if (io) {
+        io.to(`board_${id}`).emit('member_removed', { userId: parseInt(userId), boardId: parseInt(id) });
+      }
+
+      res.json({
+        message: 'Member removed successfully',
+      });
+    } catch (error) {
+      next(error);
+    }
+  },
 };
 
 export default boardController;

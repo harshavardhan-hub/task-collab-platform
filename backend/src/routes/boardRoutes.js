@@ -14,5 +14,6 @@ router.get('/boards/:id', boardController.getBoardById);
 router.put('/boards/:id', boardController.updateBoard);
 router.delete('/boards/:id', boardController.deleteBoard);
 router.post('/boards/:id/members', boardController.addMember);
+router.delete('/boards/:id/members/:userId', boardController.removeMember);
 
 export default router;
