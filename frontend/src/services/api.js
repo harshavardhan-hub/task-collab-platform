@@ -53,6 +53,7 @@ export const boardAPI = {
   update: (id, data) => api.put(`/boards/${id}`, data),
   delete: (id) => api.delete(`/boards/${id}`),
   addMember: (id, email) => api.post(`/boards/${id}/members`, { email }),
+  removeMember: (id, userId) => api.delete(`/boards/${id}/members/${userId}`),
 };
 
 // List APIs - FIXED!

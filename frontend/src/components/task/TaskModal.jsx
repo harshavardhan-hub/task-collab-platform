@@ -156,21 +156,21 @@ const TaskModal = ({ onUpdate, onDelete, onAssign, onUnassign }) => {
         </div>
 
         {/* Sidebar Metadata */}
-        <div className="w-full lg:w-72 bg-secondary-50/50 dark:bg-black/20 border-l border-secondary-200/60 dark:border-white/5 p-6 lg:p-8 flex flex-col gap-8 overflow-y-auto custom-scrollbar">
+        <div className="w-full lg:w-72 bg-secondary-50/50 dark:bg-black/20 border-l border-secondary-200/60 dark:border-white/5 p-4 lg:p-6 flex flex-col gap-6 overflow-y-auto custom-scrollbar">
           
           {/* Status / Priority */}
-          <div className="space-y-4">
-            <h4 className="text-xs font-bold uppercase tracking-widest text-secondary-400 dark:text-secondary-500">Properties</h4>
+          <div className="space-y-3">
+            <h4 className="text-[11px] font-bold uppercase tracking-widest text-secondary-400 dark:text-secondary-500">Properties</h4>
             
-            <div className="flex flex-col gap-4 text-sm">
+            <div className="flex flex-col gap-3 text-sm">
               {/* Priority */}
-              <div className="flex lg:flex-col lg:items-start items-center justify-between gap-2">
-                <span className="text-secondary-500 dark:text-secondary-400 flex items-center gap-2"><Info size={14}/> Priority</span>
+              <div className="flex items-center justify-between gap-2">
+                <span className="text-secondary-500 dark:text-secondary-400 text-xs flex items-center gap-1.5"><Info size={13}/> Priority</span>
                 {isEditing ? (
                   <select
                     value={formData.priority}
                     onChange={(e) => setFormData({ ...formData, priority: e.target.value })}
-                    className="px-3 py-1.5 rounded-lg border border-secondary-200 dark:border-white/10 bg-white dark:bg-[#232326] text-[13px] font-medium focus-ring shadow-sm w-full lg:w-auto"
+                    className="px-2 py-1 rounded-md border border-secondary-200 dark:border-white/10 bg-white dark:bg-[#232326] text-[12px] font-medium focus-ring shadow-sm w-full lg:w-auto"
                   >
                     <option value="low">Low</option>
                     <option value="medium">Medium</option>
@@ -180,7 +180,7 @@ const TaskModal = ({ onUpdate, onDelete, onAssign, onUnassign }) => {
                 ) : (
                   <span
                     className={clsx(
-                      'px-3 py-1 rounded-full text-white text-[11px] font-bold uppercase tracking-wider shadow-sm',
+                      'px-2 py-0.5 rounded-full text-white text-[10px] font-bold uppercase tracking-wider shadow-sm',
                       PRIORITY_COLORS[selectedTask.priority || 'medium']
                     )}
                   >
@@ -190,40 +190,40 @@ const TaskModal = ({ onUpdate, onDelete, onAssign, onUnassign }) => {
               </div>
 
               {/* Due Date */}
-              <div className="flex lg:flex-col lg:items-start items-center justify-between gap-2">
-                <span className="text-secondary-500 dark:text-secondary-400 flex items-center gap-2"><Calendar size={14}/> Due Date</span>
+              <div className="flex items-center justify-between gap-2">
+                <span className="text-secondary-500 dark:text-secondary-400 text-xs flex items-center gap-1.5"><Calendar size={13}/> Due Date</span>
                 {isEditing ? (
                   <input
                     type="datetime-local"
                     value={formData.dueDate}
                     onChange={(e) => setFormData({ ...formData, dueDate: e.target.value })}
-                    className="px-3 py-1.5 rounded-lg border border-secondary-200 dark:border-white/10 bg-white dark:bg-[#232326] text-[13px] font-medium focus-ring shadow-sm w-full lg:w-auto"
+                    className="px-2 py-1 rounded-md border border-secondary-200 dark:border-white/10 bg-white dark:bg-[#232326] text-[12px] font-medium focus-ring shadow-sm w-full lg:w-auto"
                   />
                 ) : selectedTask.due_date ? (
                   <div
                     className={clsx(
-                      'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[13px] font-medium border shadow-sm',
+                      'inline-flex items-center gap-1.5 px-2 py-1 rounded-md text-[11px] font-medium border shadow-sm',
                       isTaskOverdue
                         ? 'bg-red-50 dark:bg-red-500/10 text-red-600 dark:text-red-400 border-red-200 dark:border-red-500/20'
                         : 'bg-white dark:bg-white/5 text-secondary-700 dark:text-secondary-300 border-secondary-200/60 dark:border-white/5'
                     )}
                   >
                     <span>{formatDate(selectedTask.due_date)}</span>
-                    {isTaskOverdue && <AlertCircle size={14} className="text-red-500" />}
+                    {isTaskOverdue && <AlertCircle size={12} className="text-red-500" />}
                   </div>
                 ) : (
-                  <span className="text-secondary-400 dark:text-secondary-500 italic text-[13px]">No date set</span>
+                  <span className="text-secondary-400 dark:text-secondary-500 italic text-[11px]">No date set</span>
                 )}
               </div>
             </div>
           </div>
 
           {/* Assignees */}
-          <div className="space-y-4">
-            <h4 className="text-xs font-bold uppercase tracking-widest text-secondary-400 dark:text-secondary-500 flex items-center gap-2">
-              <Users size={14}/> Assignees
+          <div className="space-y-3">
+            <h4 className="text-[11px] font-bold uppercase tracking-widest text-secondary-400 dark:text-secondary-500 flex items-center gap-1.5">
+              <Users size={13}/> Assignees
             </h4>
-            <div className="bg-white dark:bg-white/5 rounded-xl p-3 border border-secondary-200/50 dark:border-white/5 shadow-sm">
+            <div className="bg-white dark:bg-white/5 rounded-lg p-2 border border-secondary-200/50 dark:border-white/5 shadow-sm">
               <TaskAssignee
                 task={selectedTask}
                 boardMembers={activeBoard?.members || []}
@@ -234,18 +234,18 @@ const TaskModal = ({ onUpdate, onDelete, onAssign, onUnassign }) => {
           </div>
 
           {/* Labels */}
-          <div className="space-y-4">
+          <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <h4 className="text-xs font-bold uppercase tracking-widest text-secondary-400 dark:text-secondary-500 flex items-center gap-2">
-                <Tag size={14}/> Labels
+              <h4 className="text-[11px] font-bold uppercase tracking-widest text-secondary-400 dark:text-secondary-500 flex items-center gap-1.5">
+                <Tag size={13}/> Labels
               </h4>
             </div>
-            <div className="flex flex-wrap gap-1.5">
+            <div className="flex flex-wrap gap-1">
               {formData.labels.map((label, index) => (
                 <span
                   key={index}
                   className={clsx(
-                    "text-xl p-1.5 rounded-lg bg-white dark:bg-white/10 shadow-sm border border-secondary-200/50 dark:border-white/5",
+                    "text-lg p-1 rounded-md bg-white dark:bg-white/10 shadow-sm border border-secondary-200/50 dark:border-white/5",
                     isEditing && "cursor-pointer hover:scale-110 hover:bg-red-50 dark:hover:bg-red-500/20 hover:border-red-200 dark:hover:border-red-500/30 transition-all"
                   )}
                   onClick={() => isEditing && handleRemoveLabel(label)}
@@ -255,19 +255,19 @@ const TaskModal = ({ onUpdate, onDelete, onAssign, onUnassign }) => {
                 </span>
               ))}
               {!isEditing && formData.labels.length === 0 && (
-                <span className="text-secondary-400 dark:text-secondary-500 italic text-[13px]">No labels</span>
+                <span className="text-secondary-400 dark:text-secondary-500 italic text-[11px]">No labels</span>
               )}
               {isEditing && (
                 <div className="relative group/label">
-                  <button className="flex items-center justify-center w-10 h-10 border-2 border-dashed border-secondary-300 dark:border-white/20 rounded-lg text-secondary-500 hover:border-primary-500 hover:text-primary-500 transition-colors">
-                    <span className="text-xl leading-none mb-1">+</span>
+                  <button className="flex items-center justify-center w-8 h-8 border-2 border-dashed border-secondary-300 dark:border-white/20 rounded-md text-secondary-500 hover:border-primary-500 hover:text-primary-500 transition-colors">
+                    <span className="text-lg leading-none mb-1">+</span>
                   </button>
-                  <div className="absolute right-0 top-full mt-2 p-3 bg-white dark:bg-[#1A1A1D] rounded-xl shadow-xl border border-secondary-200 dark:border-white/10 hidden group-hover/label:grid grid-cols-5 gap-2 z-20 w-48">
+                  <div className="absolute right-0 top-full mt-2 p-2 bg-white dark:bg-[#1A1A1D] rounded-xl shadow-xl border border-secondary-200 dark:border-white/10 hidden group-hover/label:grid grid-cols-5 gap-1 z-20 w-44">
                     {EMOJI_LABELS.map((emoji) => (
                       <button
                         key={emoji}
                         onClick={() => handleAddLabel(emoji)}
-                        className="text-2xl hover:scale-125 hover:bg-secondary-50 dark:hover:bg-white/10 p-1 rounded transition-all"
+                        className="text-xl hover:scale-125 hover:bg-secondary-50 dark:hover:bg-white/10 p-1 rounded transition-all"
                         type="button"
                       >
                         {emoji}
@@ -336,10 +336,10 @@ const TaskModal = ({ onUpdate, onDelete, onAssign, onUnassign }) => {
             )}
 
             {/* Metadata Footer */}
-            <div className="text-[11px] text-secondary-400 dark:text-secondary-500 flex flex-col gap-1 border-t border-secondary-200/60 dark:border-white/5 pt-4">
-              <div className="flex items-center gap-1.5"><Clock size={12}/> Created: {formatDate(selectedTask.created_at)}</div>
+            <div className="text-[10px] text-secondary-400 dark:text-secondary-500 flex flex-col gap-0.5 border-t border-secondary-200/60 dark:border-white/5 pt-3">
+              <div className="flex items-center gap-1.5"><Clock size={10}/> Created: {formatDate(selectedTask.created_at)}</div>
               {selectedTask.updated_at !== selectedTask.created_at && (
-                <div className="flex items-center gap-1.5"><Edit2 size={12}/> Updated: {formatDate(selectedTask.updated_at)}</div>
+                <div className="flex items-center gap-1.5"><Edit2 size={10}/> Updated: {formatDate(selectedTask.updated_at)}</div>
               )}
             </div>
           </div>
