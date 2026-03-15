@@ -42,10 +42,12 @@ export const initializeSocket = (server) => {
 
   io.on('connection', (socket) => {
     console.log(`✅ User connected: ${socket.userId}`);
+    socket.joinedBoards = new Set(); // track boards this socket joined
 
     // Join board rooms
     socket.on('join_board', (boardId) => {
       socket.join(`board_${boardId}`);
+      socket.joinedBoards.add(boardId);
       console.log(`User ${socket.userId} joined board ${boardId}`);
       
       // Notify others that user is online
@@ -53,11 +55,25 @@ export const initializeSocket = (server) => {
         userId: socket.userId,
         userEmail: socket.userEmail,
       });
+
+      // Send back the current online users in this room to the joining user
+      const room = io.sockets.adapter.rooms.get(`board_${boardId}`);
+      if (room) {
+        const onlineInRoom = [];
+        room.forEach((socketId) => {
+          const s = io.sockets.sockets.get(socketId);
+          if (s && s.userId !== socket.userId) {
+            onlineInRoom.push({ userId: s.userId, userEmail: s.userEmail });
+          }
+        });
+        socket.emit('online_users_in_board', { boardId, onlineUsers: onlineInRoom });
+      }
     });
 
     // Leave board rooms
     socket.on('leave_board', (boardId) => {
       socket.leave(`board_${boardId}`);
+      socket.joinedBoards.delete(boardId);
       console.log(`User ${socket.userId} left board ${boardId}`);
       
       // Notify others that user went offline
@@ -66,9 +82,16 @@ export const initializeSocket = (server) => {
       });
     });
 
-    // Handle disconnect
+    // Handle disconnect — notify all joined boards
     socket.on('disconnect', () => {
       console.log(`❌ User disconnected: ${socket.userId}`);
+      if (socket.joinedBoards) {
+        socket.joinedBoards.forEach((boardId) => {
+          socket.to(`board_${boardId}`).emit('user_offline', {
+            userId: socket.userId,
+          });
+        });
+      }
     });
   });
 
