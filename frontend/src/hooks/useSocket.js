@@ -6,7 +6,11 @@ import { useAuthStore } from '../store/authStore';
 
 export const useSocket = () => {
   const { isAuthenticated } = useAuthStore();
-  const { addList, updateList, deleteList, addTask, updateTask, deleteTask, moveTask, updateBoard } = useBoardStore();
+  const {
+    addList, updateList, deleteList,
+    addTask, updateTask, deleteTask, moveTask, updateBoard,
+    setOnlineUser, removeOnlineUser, clearOnlineUsers,
+  } = useBoardStore();
   const { addNotification } = useNotificationStore();
   const hasConnected = useRef(false);
 
@@ -44,15 +48,33 @@ export const useSocket = () => {
     };
   }, [isAuthenticated]);
 
-  // Join board
+  // Join board — retry until socket is connected
   const joinBoard = useCallback((boardId) => {
-    socketService.joinBoard(boardId);
+    const tryJoin = () => {
+      if (socketService.isConnected()) {
+        socketService.joinBoard(boardId);
+      } else {
+        // Socket not yet connected, wait for connect event
+        socketService.socket?.once('connect', () => {
+          socketService.joinBoard(boardId);
+        });
+        // Also kick off connection if not already connecting
+        if (!socketService.socket) {
+          socketService.connect();
+          socketService.socket?.once('connect', () => {
+            socketService.joinBoard(boardId);
+          });
+        }
+      }
+    };
+    tryJoin();
   }, []);
 
   // Leave board
   const leaveBoard = useCallback((boardId) => {
     socketService.leaveBoard(boardId);
-  }, []);
+    clearOnlineUsers();
+  }, [clearOnlineUsers]);
 
   // Setup board event listeners
   const setupBoardListeners = useCallback(() => {
@@ -69,10 +91,7 @@ export const useSocket = () => {
     socketService.on('list_created', ({ list }) => {
       addList(list);
       const message = 'New list created';
-      addNotification({
-        type: 'success',
-        message,
-      });
+      addNotification({ type: 'success', message });
       showBrowserNotification('List Created', message);
     });
 
@@ -82,20 +101,14 @@ export const useSocket = () => {
 
     socketService.on('list_deleted', ({ listId }) => {
       deleteList(listId);
-      addNotification({
-        type: 'info',
-        message: 'List deleted',
-      });
+      addNotification({ type: 'info', message: 'List deleted' });
     });
 
     // Task events
     socketService.on('task_created', ({ task }) => {
       addTask(task.list_id, task);
       const message = 'New task created';
-      addNotification({
-        type: 'success',
-        message,
-      });
+      addNotification({ type: 'success', message });
       showBrowserNotification('Task Created', message);
     });
 
@@ -109,36 +122,39 @@ export const useSocket = () => {
 
     socketService.on('task_deleted', ({ taskId }) => {
       deleteTask(taskId);
-      addNotification({
-        type: 'info',
-        message: 'Task deleted',
-      });
+      addNotification({ type: 'info', message: 'Task deleted' });
     });
 
     socketService.on('task_assigned', ({ task }) => {
       updateTask(task.id, task);
       const message = 'User assigned to task';
-      addNotification({
-        type: 'success',
-        message,
-      });
+      addNotification({ type: 'success', message });
       showBrowserNotification('Task Assignment', message);
     });
 
-    // User presence events
+    // Online presence events
     socketService.on('user_online', ({ userId, userEmail }) => {
+      setOnlineUser(userId, { userId, userEmail });
       const message = `${userEmail} joined the board`;
-      addNotification({
-        type: 'info',
-        message,
-      });
+      addNotification({ type: 'info', message });
       showBrowserNotification('User Joined', message);
     });
 
     socketService.on('user_offline', ({ userId }) => {
-      // Handle user offline
+      removeOnlineUser(userId);
     });
-  }, [addList, updateList, deleteList, addTask, updateTask, deleteTask, moveTask, updateBoard, addNotification]);
+
+    // Receive current online users when first joining a board
+    socketService.on('online_users_in_board', ({ onlineUsers }) => {
+      onlineUsers.forEach(({ userId, userEmail }) => {
+        setOnlineUser(userId, { userId, userEmail });
+      });
+    });
+  }, [
+    addList, updateList, deleteList,
+    addTask, updateTask, deleteTask, moveTask, updateBoard,
+    addNotification, setOnlineUser, removeOnlineUser,
+  ]);
 
   // Cleanup listeners
   const cleanupBoardListeners = useCallback(() => {
@@ -153,6 +169,7 @@ export const useSocket = () => {
     socketService.removeAllListeners('task_assigned');
     socketService.removeAllListeners('user_online');
     socketService.removeAllListeners('user_offline');
+    socketService.removeAllListeners('online_users_in_board');
   }, []);
 
   return {

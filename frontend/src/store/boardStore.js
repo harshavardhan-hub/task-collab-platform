@@ -6,6 +6,7 @@ export const useBoardStore = create((set, get) => ({
   lists: [],
   isLoading: false,
   error: null,
+  onlineUsers: {}, // { userId: { userId, userEmail, userName } }
 
   setBoards: (boards) => set({ boards }),
 
@@ -135,4 +136,17 @@ export const useBoardStore = create((set, get) => ({
   setLoading: (isLoading) => set({ isLoading }),
 
   setError: (error) => set({ error }),
+
+  // Online presence
+  setOnlineUser: (userId, info) => set((state) => ({
+    onlineUsers: { ...state.onlineUsers, [userId]: info },
+  })),
+
+  removeOnlineUser: (userId) => set((state) => {
+    const updated = { ...state.onlineUsers };
+    delete updated[userId];
+    return { onlineUsers: updated };
+  }),
+
+  clearOnlineUsers: () => set({ onlineUsers: {} }),
 }));

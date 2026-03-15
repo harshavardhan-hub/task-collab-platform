@@ -1,21 +1,25 @@
 import React, { useState } from 'react';
-import { UserPlus, Trash2, ArrowLeft, AlertTriangle } from 'lucide-react';
+import { UserPlus, Trash2, ArrowLeft, AlertTriangle, Wifi } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import Button from '../common/Button';
 import Avatar from '../common/Avatar';
 import Modal from '../common/Modal';
 import Input from '../common/Input';
 import { getContrastColor } from '../../utils/helpers';
+import { useBoardStore } from '../../store/boardStore';
 import clsx from 'clsx';
 import { motion } from 'framer-motion';
 
 const BoardHeader = ({ board, onAddMember, onDelete }) => {
   const navigate = useNavigate();
+  const { onlineUsers } = useBoardStore();
   const [showAddMember, setShowAddMember] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [memberEmail, setMemberEmail] = useState('');
   const [loading, setLoading] = useState(false);
   const [deleteLoading, setDeleteLoading] = useState(false);
+
+  const onlineCount = Object.keys(onlineUsers).length;
 
   const handleAddMember = async (e) => {
     e.preventDefault();
@@ -93,22 +97,46 @@ const BoardHeader = ({ board, onAddMember, onDelete }) => {
               >
                 Team Members
               </span>
-              <div className="flex items-center">
+              <div className="flex items-center gap-2">
                 <div className="flex -space-x-3">
-                  {board.members?.map((member) => (
-                    <div key={member.id} className="relative group/avatar shrink-0">
-                      <Avatar
-                        user={member}
-                        size="sm"
-                        className="ring-2 ring-white/20 shadow-md cursor-pointer transition-transform hover:-translate-y-1 hover:z-10"
-                      />
-                      <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 px-3 py-1.5 bg-[#1C1C1F] text-white text-xs font-medium rounded-lg opacity-0 group-hover/avatar:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-20 shadow-xl border border-white/10">
-                        {member.full_name} {member.role === 'owner' && <span className="opacity-50">(Owner)</span>}
-                        <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-[#1C1C1F]" />
+                  {board.members?.map((member) => {
+                    const isOnline = !!onlineUsers[member.user_id || member.id];
+                    return (
+                      <div key={member.id} className="relative group/avatar shrink-0">
+                        <Avatar
+                          user={member}
+                          size="sm"
+                          className="ring-2 ring-white/20 shadow-md cursor-pointer transition-transform hover:-translate-y-1 hover:z-10"
+                        />
+                        {/* Online/Offline indicator dot */}
+                        <span
+                          className={clsx(
+                            'absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full border-2 border-white/80 shadow-sm',
+                            isOnline ? 'bg-green-400' : 'bg-gray-400/60'
+                          )}
+                          title={isOnline ? 'Online' : 'Offline'}
+                        />
+                        <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 px-3 py-1.5 bg-[#1C1C1F] text-white text-xs font-medium rounded-lg opacity-0 group-hover/avatar:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-20 shadow-xl border border-white/10">
+                          {member.full_name} {member.role === 'owner' && <span className="opacity-50">(Owner)</span>}
+                          <span className={clsx('ml-1.5 font-semibold', isOnline ? 'text-green-400' : 'text-gray-400')}>
+                            {isOnline ? '● online' : '● offline'}
+                          </span>
+                          <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-[#1C1C1F]" />
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
+                {/* Online badge */}
+                {onlineCount > 0 && (
+                  <div className={clsx(
+                    'flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold backdrop-blur-md',
+                    isDarkText ? 'bg-black/10 text-green-700' : 'bg-white/15 text-green-300'
+                  )}>
+                    <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
+                    {onlineCount} online
+                  </div>
+                )}
               </div>
             </div>
 

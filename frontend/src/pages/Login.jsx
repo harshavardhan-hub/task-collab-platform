@@ -7,7 +7,7 @@ import { useAuth } from '../hooks/useAuth';
 import { motion } from 'framer-motion';
 
 const Login = () => {
-  const { isAuthenticated, login, loading, error } = useAuth();
+  const { isAuthenticated, login, loading, error, clearError } = useAuth();
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -87,7 +87,7 @@ const Login = () => {
                 type="email"
                 placeholder="you@example.com"
                 value={formData.email}
-                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                onChange={(e) => { setFormData({ ...formData, email: e.target.value }); clearError(); }}
                 leftIcon={<Mail size={18} />}
                 required
                 fullWidth
@@ -98,7 +98,7 @@ const Login = () => {
                 type="password"
                 placeholder="Enter your password"
                 value={formData.password}
-                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                onChange={(e) => { setFormData({ ...formData, password: e.target.value }); clearError(); }}
                 leftIcon={<Lock size={18} />}
                 required
                 fullWidth

@@ -73,6 +73,8 @@ export const useAuth = () => {
     }
   };
 
+  const clearError = () => setError(null);
+
   return {
     user,
     isAuthenticated,
@@ -82,5 +84,6 @@ export const useAuth = () => {
     login,
     logout,
     updateProfile,
+    clearError,
   };
 };

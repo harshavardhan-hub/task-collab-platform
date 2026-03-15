@@ -28,10 +28,15 @@ api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      // Token expired or invalid
-      localStorage.removeItem(STORAGE_KEYS.TOKEN);
-      localStorage.removeItem(STORAGE_KEYS.USER);
-      window.location.href = '/login';
+      const requestUrl = error.config?.url || '';
+      // Only redirect if it's NOT an auth endpoint (login/signup)
+      // On auth routes a 401 means wrong credentials, not expired session
+      const isAuthRoute = requestUrl.includes('/auth/login') || requestUrl.includes('/auth/signup');
+      if (!isAuthRoute) {
+        localStorage.removeItem(STORAGE_KEYS.TOKEN);
+        localStorage.removeItem(STORAGE_KEYS.USER);
+        window.location.href = '/login';
+      }
     }
     return Promise.reject(error);
   }

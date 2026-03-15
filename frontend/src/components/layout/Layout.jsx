@@ -2,11 +2,13 @@ import React, { useState } from 'react';
 import { Outlet } from 'react-router-dom';
 import Navbar from './Navbar';
 import Sidebar from './Sidebar';
-import { Menu } from 'lucide-react';
+import { Menu, LogOut } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { useAuth } from '../../hooks/useAuth';
 
 const Layout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const { logout } = useAuth();
 
   return (
     <div className="h-screen w-full bg-light-bg dark:bg-dark-bg text-secondary-900 dark:text-gray-100 flex overflow-hidden selection:bg-primary-500/20">
@@ -26,7 +28,14 @@ const Layout = () => {
             <Menu size={24} />
           </button>
           <div className="font-display font-bold text-lg tracking-tight gradient-text">TaskCollab</div>
-          <div className="w-8"></div> {/* Spacer for centering */}
+          {/* Mobile logout button */}
+          <button
+            onClick={logout}
+            className="p-2 text-secondary-500 hover:text-red-500 hover:bg-secondary-100 dark:hover:bg-dark-hover rounded-xl transition-colors"
+            title="Logout"
+          >
+            <LogOut size={20} />
+          </button>
         </div>
         
         {/* Desktop Navbar */}

@@ -7,7 +7,7 @@ import { useAuth } from '../hooks/useAuth';
 import { motion } from 'framer-motion';
 
 const Signup = () => {
-  const { isAuthenticated, signup, loading, error } = useAuth();
+  const { isAuthenticated, signup, loading, error, clearError } = useAuth();
   const [formData, setFormData] = useState({
     fullName: '',
     email: '',
@@ -23,6 +23,7 @@ const Signup = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setValidationError('');
+    clearError();
 
     if (formData.password !== formData.confirmPassword) {
       setValidationError('Passwords do not match');
@@ -104,7 +105,7 @@ const Signup = () => {
                 type="text"
                 placeholder="e.g. Jane Doe"
                 value={formData.fullName}
-                onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
+                onChange={(e) => { setFormData({ ...formData, fullName: e.target.value }); clearError(); setValidationError(''); }}
                 leftIcon={<User size={18} />}
                 required
                 fullWidth
@@ -115,7 +116,7 @@ const Signup = () => {
                 type="email"
                 placeholder="you@example.com"
                 value={formData.email}
-                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                onChange={(e) => { setFormData({ ...formData, email: e.target.value }); clearError(); setValidationError(''); }}
                 leftIcon={<Mail size={18} />}
                 required
                 fullWidth
@@ -126,7 +127,7 @@ const Signup = () => {
                 type="password"
                 placeholder="Minimum 6 characters"
                 value={formData.password}
-                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                onChange={(e) => { setFormData({ ...formData, password: e.target.value }); clearError(); setValidationError(''); }}
                 leftIcon={<Lock size={18} />}
                 required
                 fullWidth
@@ -137,7 +138,7 @@ const Signup = () => {
                 type="password"
                 placeholder="Re-enter your password"
                 value={formData.confirmPassword}
-                onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
+                onChange={(e) => { setFormData({ ...formData, confirmPassword: e.target.value }); setValidationError(''); }}
                 leftIcon={<Lock size={18} />}
                 required
                 fullWidth
