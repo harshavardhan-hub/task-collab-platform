@@ -3,73 +3,89 @@
 @tailwind utilities;
 
 @layer base {
+  :root {
+    --background: #FFFFFF;
+    --surface: #FBFBFB;
+    --border: #E5E7EB;
+  }
+
+  .dark {
+    --background: #09090B;
+    --surface: #121214;
+    --border: #27272A;
+  }
+
   * {
-    @apply border-gray-200 dark:border-gray-700;
+    @apply border-border;
   }
   
   body {
-    @apply bg-gray-50 dark:bg-dark-bg text-gray-900 dark:text-gray-100;
+    @apply bg-[var(--background)] text-secondary-900 dark:text-gray-100 antialiased selection:bg-primary-500/30 selection:text-primary-900 dark:selection:text-primary-100;
     font-family: 'Inter', system-ui, -apple-system, sans-serif;
   }
 
   h1, h2, h3, h4, h5, h6 {
-    font-family: 'Poppins', system-ui, sans-serif;
+    @apply font-display tracking-tight text-secondary-900 dark:text-white;
   }
 }
 
 @layer components {
-  /* Glassmorphism card */
-  .glass-card {
-    @apply bg-white/10 dark:bg-white/5 backdrop-blur-md border border-white/20 dark:border-white/10;
+  /* Glassmorphism surfaces */
+  .glass-panel {
+    @apply bg-white/70 dark:bg-[#121214]/70 backdrop-blur-md border border-light-border dark:border-dark-border;
   }
 
-  /* Custom scrollbar */
+  .glass-card {
+    @apply bg-white dark:bg-dark-card border border-light-border dark:border-dark-border shadow-sm;
+  }
+
+  /* Custom scrollbar - sleek and minimal */
   .custom-scrollbar::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
+    width: 6px;
+    height: 6px;
   }
 
   .custom-scrollbar::-webkit-scrollbar-track {
-    @apply bg-gray-200 dark:bg-dark-hover rounded-lg;
+    background: transparent;
   }
 
   .custom-scrollbar::-webkit-scrollbar-thumb {
-    @apply bg-gray-400 dark:bg-gray-600 rounded-lg hover:bg-gray-500;
+    @apply bg-secondary-200 dark:bg-secondary-700 rounded-full;
   }
 
-  /* Smooth transitions */
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    @apply bg-secondary-300 dark:bg-secondary-600;
+  }
+
+  /* Smooth interactions */
   .transition-base {
-    @apply transition-all duration-200 ease-in-out;
+    @apply transition-all duration-200 ease-out;
   }
 
-  /* Button hover effects */
-  .btn-hover {
-    @apply transform hover:scale-105 active:scale-95 transition-transform;
-  }
-
-  /* Card hover effects */
-  .card-hover {
-    @apply transform hover:-translate-y-1 hover:shadow-xl transition-all duration-300;
-  }
-
-  /* Gradient text */
-  .gradient-text {
-    @apply bg-gradient-to-r from-primary-500 to-secondary-500 bg-clip-text text-transparent;
-  }
-
-  /* Skeleton loading */
-  .skeleton {
-    @apply animate-pulse bg-gray-200 dark:bg-dark-hover rounded;
-  }
-
-  /* Focus styles */
+  /* Focus rings */
   .focus-ring {
-    @apply focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 dark:focus:ring-offset-dark-bg;
+    @apply focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-dark-bg;
+  }
+
+  /* Skeleton loading with shimmer */
+  .skeleton {
+    @apply bg-secondary-200 dark:bg-secondary-800 relative overflow-hidden rounded-md;
+  }
+  .skeleton::after {
+    @apply absolute top-0 right-0 bottom-0 left-0 -translate-x-full;
+    background-image: linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0) 0,
+      rgba(255, 255, 255, 0.2) 20%,
+      rgba(255, 255, 255, 0.5) 60%,
+      rgba(255, 255, 255, 0)
+    );
+    animation: shimmer 2s infinite;
+    content: '';
   }
 }
 
 @layer utilities {
-  /* Text ellipsis utilities */
   .truncate-2 {
     display: -webkit-box;
     -webkit-line-clamp: 2;
@@ -77,14 +93,6 @@
     overflow: hidden;
   }
 
-  .truncate-3 {
-    display: -webkit-box;
-    -webkit-line-clamp: 3;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-  }
-
-  /* Hide scrollbar but keep functionality */
   .scrollbar-hide {
     -ms-overflow-style: none;
     scrollbar-width: none;
@@ -95,44 +103,14 @@
   }
 }
 
-/* Loading spinner animation */
 @keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes shimmer {
+  100% { transform: translateX(100%); }
 }
 
 .spinner {
   animation: spin 1s linear infinite;
-}
-
-/* Toast notification animations */
-@keyframes toast-in {
-  from {
-    transform: translateX(100%);
-    opacity: 0;
-  }
-  to {
-    transform: translateX(0);
-    opacity: 1;
-  }
-}
-
-@keyframes toast-out {
-  from {
-    transform: translateX(0);
-    opacity: 1;
-  }
-  to {
-    transform: translateX(100%);
-    opacity: 0;
-  }
-}
-
-.toast-enter {
-  animation: toast-in 0.3s ease-out;
-}
-
-.toast-exit {
-  animation: toast-out 0.3s ease-in;
 }

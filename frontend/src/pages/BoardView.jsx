@@ -16,7 +16,7 @@ import { boardAPI, listAPI, taskAPI } from '../services/api';
 import { useSocket } from '../hooks/useSocket';
 import { useToast } from '../hooks/useToast';
 import ToastContainer from '../components/common/Toast';
-
+import { motion, AnimatePresence } from 'framer-motion';
 
 const BoardView = () => {
   const { id } = useParams();
@@ -26,14 +26,12 @@ const BoardView = () => {
   const { joinBoard, leaveBoard, setupBoardListeners, cleanupBoardListeners } = useSocket();
   const { toasts, removeToast, success, error } = useToast();
 
-
   const [showCreateList, setShowCreateList] = useState(false);
   const [showCreateTask, setShowCreateTask] = useState(false);
   const [selectedListId, setSelectedListId] = useState(null);
   const [showActivity, setShowActivity] = useState(false);
   const [activeId, setActiveId] = useState(null);
   const [loading, setLoading] = useState(true);
-
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -43,12 +41,10 @@ const BoardView = () => {
     })
   );
 
-
   useEffect(() => {
     loadBoard();
     setupBoardListeners();
     joinBoard(parseInt(id));
-
 
     return () => {
       cleanupBoardListeners();
@@ -57,7 +53,6 @@ const BoardView = () => {
     };
   }, [id]);
 
-
   const loadBoard = async () => {
     try {
       setLoading(true);
@@ -65,13 +60,13 @@ const BoardView = () => {
       setActiveBoard(response.data.board);
     } catch (err) {
       console.error('Failed to load board:', err);
-      error(err.response?.data?.error || 'Failed to load board');
+      // Wait to see if error logic handles correctly
+      error(err?.response?.data?.error || 'Failed to load board');
       setTimeout(() => navigate('/dashboard'), 2000);
     } finally {
       setLoading(false);
     }
   };
-
 
   const handleCreateList = async (title) => {
     try {
@@ -84,7 +79,6 @@ const BoardView = () => {
     }
   };
 
-
   const handleUpdateList = async (listId, updates) => {
     try {
       await listAPI.update(listId, updates);
@@ -94,7 +88,6 @@ const BoardView = () => {
       error('Failed to update list');
     }
   };
-
 
   const handleDeleteList = async (listId) => {
     if (!window.confirm('Delete this list and all its tasks?')) return;
@@ -108,7 +101,6 @@ const BoardView = () => {
     }
   };
 
-
   const handleDeleteBoard = async (boardId) => {
     try {
       await boardAPI.delete(boardId);
@@ -116,10 +108,9 @@ const BoardView = () => {
       success('Board deleted successfully!');
       navigate('/dashboard');
     } catch (err) {
-      error(err.response?.data?.error || 'Failed to delete board');
+      error(err?.response?.data?.error || 'Failed to delete board');
     }
   };
-
 
   const handleCreateTask = async (formData) => {
     try {
@@ -132,7 +123,6 @@ const BoardView = () => {
     }
   };
 
-
   const handleUpdateTask = async (taskId, updates) => {
     try {
       const response = await taskAPI.update(taskId, updates);
@@ -143,7 +133,6 @@ const BoardView = () => {
       error('Failed to update task');
     }
   };
-
 
   const handleDeleteTask = async (taskId) => {
     try {
@@ -156,7 +145,6 @@ const BoardView = () => {
     }
   };
 
-
   const handleAssignUser = async (taskId, userId) => {
     try {
       const response = await taskAPI.assign(taskId, userId);
@@ -164,10 +152,9 @@ const BoardView = () => {
       updateSelectedTask(response.data.task);
       success('User assigned!');
     } catch (err) {
-      error(err.response?.data?.error || 'Failed to assign user');
+      error(err?.response?.data?.error || 'Failed to assign user');
     }
   };
-
 
   const handleUnassignUser = async (taskId, userId) => {
     try {
@@ -180,39 +167,31 @@ const BoardView = () => {
     }
   };
 
-
   const handleAddMember = async (email) => {
     try {
       await boardAPI.addMember(id, email);
       await loadBoard();
       success('Member added!');
     } catch (err) {
-      error(err.response?.data?.error || 'Failed to add member');
+      error(err?.response?.data?.error || 'Failed to add member');
     }
   };
-
 
   const handleDragStart = (event) => {
     setActiveId(event.active.id);
   };
 
-
   const handleDragEnd = async (event) => {
     const { active, over } = event;
     setActiveId(null);
 
-
     if (!over) return;
-
 
     const activeTaskId = parseInt(active.id.toString().replace('task-', ''));
     const overListId = parseInt(over.id.toString().replace('list-', ''));
 
-
-    // Find the task and its current list
     let currentTask = null;
     let currentListId = null;
-
 
     for (const list of lists) {
       const task = list.tasks?.find((t) => t.id === activeTaskId);
@@ -223,19 +202,14 @@ const BoardView = () => {
       }
     }
 
-
     if (!currentTask || currentListId === overListId) return;
 
-
-    // Calculate new position (add to end of list)
     const targetList = lists.find((l) => l.id === overListId);
     const newPosition = targetList?.tasks?.length || 0;
-
 
     try {
       // Optimistic update
       moveTask(activeTaskId, overListId, newPosition);
-
 
       // API call
       await taskAPI.move(activeTaskId, {
@@ -243,8 +217,7 @@ const BoardView = () => {
         newPosition,
       });
 
-
-      success('Task moved!');
+      //success('Task moved!'); // Too noisy for quick moves
     } catch (err) {
       error('Failed to move task');
       // Revert on error
@@ -252,28 +225,22 @@ const BoardView = () => {
     }
   };
 
-
   if (loading || !activeBoard) {
     return (
-      <div className="flex items-center justify-center h-screen">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-500 mx-auto mb-4"></div>
-          <p className="text-gray-600 dark:text-gray-400">Loading board...</p>
-        </div>
+      <div className="flex flex-col items-center justify-center h-full min-h-[50vh]">
+        <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary-500 mx-auto mb-4"></div>
+        <p className="text-secondary-500 dark:text-secondary-400 font-medium tracking-wide">Orchestrating board...</p>
       </div>
     );
   }
-
 
   const activeTask = lists
     .flatMap((list) => list.tasks || [])
     .find((task) => `task-${task.id}` === activeId);
 
-
   return (
-    <div className="h-full">
+    <div className="flex flex-col h-full -mx-4 sm:-mx-6 lg:-mx-8 px-4 sm:px-6 lg:px-8">
       <ToastContainer toasts={toasts} onClose={removeToast} />
-
 
       <BoardHeader
         board={activeBoard}
@@ -281,40 +248,36 @@ const BoardView = () => {
         onDelete={handleDeleteBoard}
       />
 
-
       {/* Actions */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0 mb-6">
-        <Button
-          variant="primary"
-          onClick={() => setShowCreateList(true)}
-          leftIcon={<Plus size={18} />}
-          className="w-full sm:w-auto"
-        >
-          Add List
-        </Button>
-
-
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-6">
         <Button
           variant="outline"
           onClick={() => setShowActivity(!showActivity)}
           leftIcon={<Activity size={18} />}
-          className="w-full sm:w-auto"
+          className="w-full sm:w-auto rounded-xl shadow-sm bg-white dark:bg-[#1C1C1F]"
         >
-          Activity
+          {showActivity ? 'Hide Activity' : 'Show Activity'}
+        </Button>
+        <Button
+          variant="primary"
+          onClick={() => setShowCreateList(true)}
+          leftIcon={<Plus size={18} />}
+          className="w-full sm:w-auto rounded-xl shadow-[0_2px_10px_rgba(94,106,210,0.3)]"
+        >
+          Create List
         </Button>
       </div>
 
-
-      <div className="flex flex-col lg:flex-row gap-6">
-        {/* Lists */}
-        <div className="flex-1 overflow-x-auto">
+      <div className="flex-1 flex flex-col lg:flex-row gap-6 overflow-hidden pb-4">
+        {/* Lists Container */}
+        <div className="flex-1 overflow-x-auto overflow-y-hidden custom-scrollbar pb-4 relative">
           <DndContext
             sensors={sensors}
             collisionDetection={closestCorners}
             onDragStart={handleDragStart}
             onDragEnd={handleDragEnd}
           >
-            <div className="flex gap-4 pb-4 min-w-min">
+            <div className="flex gap-5 min-w-min h-full">
               {lists.map((list) => (
                 <List
                   key={list.id}
@@ -327,27 +290,43 @@ const BoardView = () => {
                   onDeleteList={handleDeleteList}
                 />
               ))}
+              
+              {/* Ghost Add List Column */}
+              <button 
+                onClick={() => setShowCreateList(true)}
+                className="flex-shrink-0 w-[320px] h-[72px] rounded-2xl border-2 border-dashed border-secondary-200/60 dark:border-white/10 flex items-center justify-center gap-2 text-secondary-500 dark:text-secondary-400/80 hover:text-primary-500 hover:border-primary-500/50 hover:bg-primary-50/50 dark:hover:bg-primary-900/10 transition-all font-semibold tracking-wide"
+              >
+                <Plus size={20} />
+                <span>Add new list</span>
+              </button>
             </div>
 
-
-            <DragOverlay>
-              {activeTask && <TaskCard task={activeTask} />}
+            <DragOverlay dropAnimation={{
+              duration: 250,
+              easing: 'cubic-bezier(0.18, 0.67, 0.6, 1.22)',
+            }}>
+              {activeTask ? <div className="rotate-2 scale-105 shadow-2xl opacity-90"><TaskCard task={activeTask} /></div> : null}
             </DragOverlay>
           </DndContext>
         </div>
 
-
         {/* Activity Sidebar */}
-        {showActivity && (
-          <div className="w-full lg:w-80 bg-white dark:bg-dark-card rounded-xl p-4 shadow-lg max-h-96 lg:max-h-[calc(100vh-20rem)] overflow-y-auto custom-scrollbar">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-              Activity Feed
-            </h3>
-            <ActivityFeed boardId={parseInt(id)} />
-          </div>
-        )}
+        <AnimatePresence>
+          {showActivity && (
+            <motion.div 
+              initial={{ opacity: 0, x: 20, width: 0 }}
+              animate={{ opacity: 1, x: 0, width: "320px" }}
+              exit={{ opacity: 0, x: 20, width: 0 }}
+              className="hidden lg:block h-full bg-white dark:bg-[#1A1A1D] rounded-2xl border border-secondary-200/60 dark:border-white/5 shadow-sm p-5 overflow-y-auto custom-scrollbar flex-shrink-0"
+            >
+              <h3 className="text-xl font-display font-semibold text-secondary-900 dark:text-white mb-6">
+                Activity Feed
+              </h3>
+              <ActivityFeed boardId={parseInt(id)} />
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
-
 
       {/* Modals */}
       <CreateListModal
@@ -356,13 +335,11 @@ const BoardView = () => {
         onSubmit={handleCreateList}
       />
 
-
       <CreateTaskModal
         isOpen={showCreateTask}
         onClose={() => setShowCreateTask(false)}
         onSubmit={handleCreateTask}
       />
-
 
       <TaskModal
         onUpdate={handleUpdateTask}
@@ -373,6 +350,5 @@ const BoardView = () => {
     </div>
   );
 };
-
 
 export default BoardView;

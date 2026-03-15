@@ -14,10 +14,10 @@ const CreateListModal = ({ isOpen, onClose, onSubmit, loading }) => {
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="Create New List" size="sm">
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form onSubmit={handleSubmit} className="space-y-6 pt-2">
         <Input
           label="List Title"
-          placeholder="Enter list title"
+          placeholder="e.g., Todo, In Progress, Done"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           required
@@ -25,7 +25,7 @@ const CreateListModal = ({ isOpen, onClose, onSubmit, loading }) => {
           autoFocus
         />
 
-        <div className="flex gap-3 pt-2">
+        <div className="flex gap-4 pt-2">
           <Button
             type="button"
             variant="ghost"

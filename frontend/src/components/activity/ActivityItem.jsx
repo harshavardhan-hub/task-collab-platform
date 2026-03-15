@@ -29,21 +29,29 @@ const ActivityItem = ({ activity }) => {
   const Icon = icons[activity.action] || CheckSquare;
 
   return (
-    <div className="flex items-start gap-3 p-3 bg-white dark:bg-dark-card rounded-lg border border-gray-200 dark:border-gray-700">
-      <Avatar user={{ id: activity.user_id, full_name: activity.user_name, avatar_url: activity.user_avatar }} size="sm" />
+    <div className="group relative flex items-start gap-4 p-4 bg-white dark:bg-[#1C1C1F] hover:bg-secondary-50 dark:hover:bg-[#232326] transition-colors rounded-2xl border border-secondary-200 dark:border-dark-border shadow-sm">
+      <div className="relative z-10 hidden sm:block bg-white dark:bg-[#1C1C1F] p-1 rounded-full border border-secondary-200 dark:border-dark-border">
+        <Avatar user={{ id: activity.user_id, full_name: activity.user_name, avatar_url: activity.user_avatar }} size="sm" showBorder />
+      </div>
+
+      <div className="sm:hidden -ml-2">
+         <Avatar user={{ id: activity.user_id, full_name: activity.user_name, avatar_url: activity.user_avatar }} size="sm" />
+      </div>
       
-      <div className="flex-1 min-w-0">
-        <div className="flex items-start gap-2">
-          <Icon size={16} className="text-gray-500 dark:text-gray-400 mt-0.5 flex-shrink-0" />
+      <div className="flex-1 min-w-0 pt-0.5">
+        <div className="flex items-start gap-3">
+          <div className="w-8 h-8 rounded-full bg-secondary-100 dark:bg-dark-hover flex items-center justify-center flex-shrink-0 text-secondary-500">
+            <Icon size={14} strokeWidth={2.5} />
+          </div>
           <div className="flex-1">
-            <p className="text-sm text-gray-900 dark:text-white">
-              <span className="font-medium">{activity.user_name || 'Someone'}</span>
+            <p className="text-[13px] leading-relaxed text-secondary-900 dark:text-white mb-1">
+              <span className="font-semibold">{activity.user_name || 'Someone'}</span>
               {' '}
-              <span className="text-gray-600 dark:text-gray-400">
+              <span className="text-secondary-600 dark:text-secondary-300">
                 {getActivityMessage(activity)}
               </span>
             </p>
-            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+            <p className="text-[11px] font-medium text-secondary-400 dark:text-secondary-500 uppercase tracking-wider">
               {getRelativeTime(activity.created_at)}
             </p>
           </div>

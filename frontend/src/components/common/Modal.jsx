@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { X } from 'lucide-react';
 import clsx from 'clsx';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const Modal = ({
   isOpen,
@@ -34,14 +35,12 @@ const Modal = ({
     return () => document.removeEventListener('keydown', handleEscape);
   }, [isOpen, onClose]);
 
-  if (!isOpen) return null;
-
   const sizes = {
     sm: 'max-w-md',
-    md: 'max-w-2xl',
-    lg: 'max-w-4xl',
-    xl: 'max-w-6xl',
-    full: 'max-w-full mx-4',
+    md: 'max-w-xl',
+    lg: 'max-w-3xl',
+    xl: 'max-w-5xl',
+    full: 'max-w-[95vw]',
   };
 
   const handleOverlayClick = (e) => {
@@ -51,42 +50,55 @@ const Modal = ({
   };
 
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fade-in"
-      onClick={handleOverlayClick}
-    >
-      <div
-        className={clsx(
-          'relative w-full bg-white dark:bg-dark-card rounded-2xl shadow-2xl animate-scale-in',
-          'max-h-[90vh] flex flex-col',
-          sizes[size]
-        )}
-      >
-        {/* Header */}
-        {(title || showCloseButton) && (
-          <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-            {title && (
-              <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
-                {title}
-              </h2>
+    <AnimatePresence>
+      {isOpen && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.2 }}
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-black/40 backdrop-blur-sm"
+          onClick={handleOverlayClick}
+        >
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95, y: 10 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.95, y: 10 }}
+            transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+            className={clsx(
+              'relative w-full bg-white dark:bg-[#151518] border border-light-border dark:border-dark-border rounded-2xl shadow-2xl',
+              'max-h-[90vh] flex flex-col',
+              sizes[size]
             )}
-            {showCloseButton && (
-              <button
-                onClick={onClose}
-                className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-dark-hover transition-base"
-              >
-                <X size={20} />
-              </button>
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Header */}
+            {(title || showCloseButton) && (
+              <div className="flex items-center justify-between px-6 py-5 border-b border-gray-100 dark:border-dark-border/50">
+                {title && (
+                  <h2 className="text-lg font-display font-semibold text-secondary-900 dark:text-white">
+                    {title}
+                  </h2>
+                )}
+                {showCloseButton && (
+                  <button
+                    onClick={onClose}
+                    className="p-1.5 -mr-1.5 text-secondary-400 hover:text-secondary-600 dark:hover:text-gray-300 rounded-lg hover:bg-secondary-100 dark:hover:bg-dark-hover transition-colors"
+                  >
+                    <X size={20} />
+                  </button>
+                )}
+              </div>
             )}
-          </div>
-        )}
 
-        {/* Content */}
-        <div className="flex-1 overflow-y-auto custom-scrollbar px-6 py-4">
-          {children}
-        </div>
-      </div>
-    </div>
+            {/* Content */}
+            <div className="flex-1 overflow-y-auto custom-scrollbar p-6">
+              {children}
+            </div>
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 };
 
